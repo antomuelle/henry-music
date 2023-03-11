@@ -1,0 +1,49 @@
+.flow {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.flow ._column {
+  flex: none;
+  width: calc(10% - 1rem);
+}
+
+.circle {
+  padding: 1em;
+  border-radius: .5rem;
+  background-color: #424242;
+}
+.circle img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+.circle .name {
+  text-align: center;
+  font-weight: 500;
+  padding-top: .5em;
+}
+
+.card {
+  border-radius: .5rem;
+  background-color: #424242;
+}
+.card img {border-radius: .5rem .5rem 0 0;}
+.card .text {padding: .5em;}
+.card .text .name, .card .text .artist {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.card .text .name {
+  font-weight: 700;
+}
+
+@media screen and (max-width: 1280px) {
+  .flow ._column {
+    width: calc(20% - 1rem);
+  }
+}
+@media screen and (max-width: 480px) {
+  .flow ._column {
+    width: calc(50% - 1rem);
+  }
+}
