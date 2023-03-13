@@ -48,17 +48,25 @@
   .logo {display: none;}
   .menu {display: flex;}
   .menu a {
+    font-size: 0.875em;
     display: inline-block;
     white-space: normal;
     text-align: center;
     flex: 1;
-    padding: .5em 0;
+    padding: .75em 0;
   }
   .menu i {
     padding: 0;
     padding-bottom: .25em;
     width: auto;
     display: block;
+    font-size: 1.25rem;
+  }
+  .menu span {
+    font-size: 12px;
+    font-weight: 300;
+    display: block;
+    line-height: 1;
   }
   .shink {display: none;}
   .sidebar.minimize .menu span {

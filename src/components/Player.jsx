@@ -7,6 +7,7 @@ let audio
 
 export default function Player() {
   const currentTrack = useSelector((state)=> state.currentTrack)
+  const meta = useRef(null)// { playing: false, }
   const [currentTime, setCurrentTime] = useState(0)
   const [loaded, setLoaded] = useState(0)
   const [state, setState] = useState({
@@ -16,18 +17,20 @@ export default function Player() {
   })
 
   const mounted = useOnMounted(()=> {
+    console.log('player mounted')
     audio = new Audio()
     setCurrentTime(0)
+    setPlaying(false)
     audio.ondurationchange = setDuration
     audio.onloadedmetadata = setDuration
     audio.ontimeupdate = () => setCurrentTime(audio.currentTime)
     audio.onloadstart = () => console.log('onloadstart')
     audio.onloadeddata = () => console.log('onloadeddata')
-    audio.oncanplay = () => { audio.play() }
-    audio.onprogress = () => {setLoaded(audio.buffered.end(0))}
+    audio.oncanplay = () => { meta.playing && audio.play() }
+    audio.onprogress = () => { setLoaded(audio.buffered.end(audio.buffered.length - 1)) }
     audio.onpause = () => { setPlaying() }
     audio.onplay = () => { setPlaying() }
-    audio.onvolumechange = () => { setState({ ...state, muted: audio.muted }) }
+    audio.onvolumechange = () => { setState(state=> ({ ...state, muted: audio.muted })) }
     audio.onplaying = () => console.log('onplaying')
     audio.onseeked = () => console.log('onseeked')
     audio.onended = () => console.log('onended')
@@ -35,6 +38,7 @@ export default function Player() {
     audio.onstalled = () => console.log('onstalled')
     audio.onabort = () => console.log('onabort')
     return ()=> {
+      console.log('player unmounted')
       audio.ondurationchange = null
       audio.onloadedmetadata = null
       audio.ontimeupdate = null
@@ -60,13 +64,34 @@ export default function Player() {
     if (!currentTrack) return
     setLoaded(0)
     setCurrentTime(0)
-    setState({ ...state, duration: 0 })
+    setPlaying(true)
+    setDuration(0)
     audio.src = currentTrack.play_url
+    audio.play().then(()=> updateMediaMetadata(currentTrack))
   }, [currentTrack], mounted)
 
-  function setDuration() { setState({ ...state, duration: audio.duration }) }
-  function setPlaying() { setState((state)=> ({ ...state, playing: !audio.paused })) }
+  function updateMediaMetadata(track) {
+    if (!('mediaSession' in navigator)) return
+    // navigator.mediaSession.setActionHandler('nexttrack', ()=> console.log('nexttrack'))
+    const artwork = track.album.images.map(img=> ({ src: img.url, sizes: img.width + 'x' + img.height, type: 'image/jpeg' }))
+    console.log('artwork', artwork)
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.name,
+      artist: track.artists.map(a=> a.name).join(', '),
+      album: track.album.name,
+      artwork: artwork,
+    })
+  }
+
   function togglePlay() { audio.paused ? audio.play() : audio.pause() }
+  function setDuration(value = null) {
+    setState(state=> ({ ...state, duration: (typeof value === 'number' ? value : audio.duration) }))
+  }
+  function setPlaying(value = null) {
+    value ??= !audio.paused
+    setState((state)=> ({ ...state, playing: (meta.playing = value) }))
+  }
+  const volume = audio ? (audio.muted ? 0 : audio.volume) : 0
 
   return (
   <div className='player'>
@@ -93,10 +118,9 @@ export default function Player() {
     </div>
     <div className="extra">
       <div className="volume">
-        <i onClick={()=> {audio.muted = !audio.muted}} className={'fas fa-volume-' + (state.muted ? 'xmark' : 'low')}></i>
-        <TabProgress total={1} value={audio ? audio.volume : 0}
-          onDragEnd={(value)=> audio.volume = value }
-          onDrag={(value)=> audio.volume = value } />
+        <i onClick={()=> {audio.muted = !audio.muted}} className={'fas fa-volume-' + (state.muted || !audio?.volume ? 'xmark' : 'low')}></i>
+        <TabProgress total={1} value={volume}
+          onDrag={(value)=> {audio.volume = value; value > 0 && (audio.muted = false)}} />
       </div>
     </div>
   </div>
@@ -105,19 +129,19 @@ export default function Player() {
 
 export function TimeProgress({ time, total, loaded, }) {
   const touching = useRef(false)
-  const [seekable, setSeekable] = useState(0)
+  const [timeSeekable, setTimeSeekable] = useState(0)
   useEffect(()=> {
     if (touching.current) return
-    setSeekable(time)
+    setTimeSeekable(time)
   }, [time])
 
   return (
   <div className='time-progress'>
-    <div className="text">{parseTime(seekable)}</div>
+    <div className="text">{parseTime(timeSeekable)}</div>
     <TabProgress value={time} total={total} meter={loaded}
       onDragStart={()=> touching.current = true}
-      onDragEnd={(part)=> {audio.currentTime = part; touching.current = false} }
-      onDrag={(part)=> setSeekable(part)} />
+      onDragEnd={(value)=> {audio.currentTime = value; touching.current = false} }
+      onDrag={(value)=> setTimeSeekable(value)} />
     <div className="text">{parseTime(total)}</div>
   </div>
   )
@@ -136,7 +160,7 @@ export function TabProgress({value, total, meter=null, onDragStart=null, onDrag=
     }
   }, [])
   useEffect(()=> {
-    if (total === 0) {value = 0, total = 1;}
+    // if (total === 0) {value = 0, total = 1;}
     setAdvanced(value)
     if (touching.current) return
     setSlicer(value / total * 100)
@@ -189,7 +213,8 @@ export function TabProgress({value, total, meter=null, onDragStart=null, onDrag=
 }
 
 export function Progress({ value, total = 100, meter = null }) {
-  if (total === 0) value = 0, total = 1
+  // if (total === 0) value = 0, total = 1
+  if (total <= 0) return <div className='progress'></div>
   return (
   <div className='progress'>
     {meter != null && <p className="meter" style={{width: (meter / total * 100 + '%')}}></p>}

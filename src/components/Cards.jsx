@@ -1,11 +1,12 @@
 import { useDispatch } from 'react-redux'
-import { Actions } from '../slice'
+import { Actions, fetchArtistTracks } from '../slice'
 import '../styles/cards.css'
 import { pickImage } from '../lib/utils'
 
 export function Circle({artist}) {
+  const dispatch = useDispatch()
   return (
-  <div className='_column circle'>
+  <div className='_column circle' onClick={()=> { dispatch(fetchArtistTracks(artist.id)) }}>
     <div className='_ratio _1-1'>
       {!artist.images.length && console.log(artist)}
       <img src={pickImage(artist.images)} alt={artist.name} />
