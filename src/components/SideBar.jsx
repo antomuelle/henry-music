@@ -13,23 +13,25 @@ export default function SideBar() {
 
   return (
   <div className='_column sidebar'>
-    <img className="logo" src={logo} alt="music logo" />
-    <div className="menu">
-      <NavLink to="/">
-        <i className="fas fa-home"></i>
-        <span>Home</span></NavLink>
-      <NavLink to="/search">
-        <i className="fas fa-search"></i>
-        <span>Search</span></NavLink>
-      <NavLink to="/collection">
-        <i className="fas fa-layer-group"></i>
-        <span>Your Library</span></NavLink>
-      <NavLink to="/collection/liked">
-        <i className="fas fa-heart"></i>
-        <span>Liked Songs</span></NavLink>
+    <div className="wrapper">
+      <img className="logo" src={logo} alt="music logo" />
+      <div className="menu">
+        <NavLink to="/">
+          <i className="fas fa-home"></i>
+          <span>Home</span></NavLink>
+        <NavLink to="/search">
+          <i className="fas fa-search"></i>
+          <span>Search</span></NavLink>
+        <NavLink to="/collection">
+          <i className="fas fa-layer-group"></i>
+          <span>Your Library</span></NavLink>
+        <NavLink to="/collection/liked">
+          <i className="fas fa-heart"></i>
+          <span>Liked Songs</span></NavLink>
+      </div>
+      <div onClick={minimize} className="shink">
+        <i className="fas fa-square-caret-left"></i></div>
     </div>
-    <div onClick={minimize} className="shink">
-      <i className="fas fa-square-caret-left"></i></div>
   </div>
   )
 }

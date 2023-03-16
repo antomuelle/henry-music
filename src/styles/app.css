@@ -1,13 +1,12 @@
 #root {
   text-align: center;
   background-color: #242424;
-  --mobi: 480px;
-  height: 100vh;
+  height: 100%;
 }
 
 .main {
-  height: 100%;
-  padding-bottom: 5.75rem;
+  height: calc(100% - var(--player-height, 93px));
+  /* padding-bottom: 5.75rem; */
   box-sizing: border-box;
 }
 
@@ -24,6 +23,10 @@ header .dinamic {
 .floor {overflow-y: auto;}
 
 @media screen and (max-width: 480px) {
-  .main {padding-bottom: 0;}
-  .floor {padding-bottom: 9rem;}
+  #root {height: auto;}
+  .main {padding-bottom: 0;height: auto;}
+  .floor {
+    overflow-y: initial;
+    padding-bottom: calc(var(--player-height, 136px) + var(--sidebar-height, 58px));
+  }
 }

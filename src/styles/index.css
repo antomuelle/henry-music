@@ -1,4 +1,6 @@
 html, body {height: 100%;}
+/* Disables pull-to-refresh but allows overscroll glow effects. */
+body {overscroll-behavior: contain;}
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

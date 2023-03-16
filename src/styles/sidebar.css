@@ -44,6 +44,13 @@
 }
 
 @media screen and (max-width: 480px) {
+  .sidebar .wrapper {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 200;
+    background-color: #242424;
+  }
   .main {flex-direction: column-reverse;}
   .logo {display: none;}
   .menu {display: flex;}
