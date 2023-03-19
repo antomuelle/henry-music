@@ -25,6 +25,14 @@ body {overscroll-behavior: contain;}
   --white5: #e0e0e0;
   --white6: #bdbdbd;
 
+  --black1: #000000;
+  --black2: #161616;
+  --black3: #212121;
+  --black4: #242424;
+  --black5: #2c2c2c;
+  --black6: #303030;
+  --black7: #424242;
+
   --theme1: #006064;
   --theme2: #00838F;
   --theme3: #0097A7;
@@ -65,8 +73,6 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {border-color: var(--orange4);}
-button:focus,
-button:focus-visible {outline: 4px auto -webkit-focus-ring-color;}
 
 /* @media (prefers-color-scheme: light) {
   :root {

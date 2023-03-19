@@ -65,6 +65,7 @@ export function randomInt(min, max) {
  */
 export function removeItem(arr, elem) {
   const index = arr.indexOf(elem)
+  console.log('removeItem', index)
   if (index >= 0)
     arr.splice(index, 1)
   return index
@@ -77,6 +78,16 @@ export function removeItem(arr, elem) {
  */
 export function filterItem(arr, elem) {
   return arr.filter( (item)=> item !== elem)
+}
+
+/* Randomize array in-place using Durstenfeld shuffle algorithm */
+export function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
 }
 
 export const sleep = (ms = 1000)=> new Promise((resolve)=> setTimeout(resolve, ms))

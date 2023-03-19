@@ -1,12 +1,17 @@
 import '../styles/player.css'
+import defaultCover from '../assets/album.png'
 import { useEffect, useRef, useState } from 'react'
 import { parseTime, pickImage, useOnMounted, useOnUpdate } from '../lib/utils'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { Actions } from '../slice'
 
+const MIN_TIME_PREV = 5
 let audio
 
 export default function Player() {
+  const dispatch = useDispatch()
   const currentTrack = useSelector((state)=> state.currentTrack)
+  const shuffle = useSelector((state)=> state.shuffle)
   const meta = useRef(null)// { playing: false, }
   const [currentTime, setCurrentTime] = useState(0)
   const [loaded, setLoaded] = useState(0)
@@ -14,31 +19,31 @@ export default function Player() {
     playing: false,
     duration: 0,
     muted: false,
+    repeat: 0,// 0: off, 1: on, 2: once
+    playAgain: false,
   })
 
   const mounted = useOnMounted(()=> {
-    console.log('player mounted')
     audio = new Audio()
     setCurrentTime(0)
     setPlaying(false)
     audio.ondurationchange = setDuration
     audio.onloadedmetadata = setDuration
     audio.ontimeupdate = () => setCurrentTime(audio.currentTime)
-    audio.onloadstart = () => console.log('onloadstart')
-    audio.onloadeddata = () => console.log('onloadeddata')
     audio.oncanplay = () => { meta.playing && audio.play() }
     audio.onprogress = () => { setLoaded(audio.buffered.end(audio.buffered.length - 1)) }
-    audio.onpause = () => { setPlaying() }
-    audio.onplay = () => { setPlaying() }
+    audio.onpause = setPlaying
+    audio.onplay = setPlaying
     audio.onvolumechange = () => { setState(state=> ({ ...state, muted: audio.muted })) }
-    audio.onplaying = () => console.log('onplaying')
+    audio.onplaying = () => {console.log('onplaying');setDuration()}
+    audio.onended = onPlayEnd
     audio.onseeked = () => console.log('onseeked')
-    audio.onended = () => console.log('onended')
+    audio.onloadstart = () => console.log('onloadstart')
+    audio.onloadeddata = () => console.log('onloadeddata')
     audio.onerror = () => console.log('onerror')
     audio.onstalled = () => console.log('onstalled')
     audio.onabort = () => console.log('onabort')
     return ()=> {
-      console.log('player unmounted')
       audio.ondurationchange = null
       audio.onloadedmetadata = null
       audio.ontimeupdate = null
@@ -66,26 +71,81 @@ export default function Player() {
     setCurrentTime(0)
     setPlaying(true)
     setDuration(0)
+    setState(state=> ({ ...state, playAgain: state.repeat === 2 }))
     audio.src = currentTrack.play_url
-    audio.play().then(()=> updateMediaMetadata(currentTrack))
+    updateMediaMetadata(currentTrack)
   }, [currentTrack], mounted)
 
   function updateMediaMetadata(track) {
     if (!('mediaSession' in navigator)) return
-    // navigator.mediaSession.setActionHandler('nexttrack', ()=> console.log('nexttrack'))
     const artwork = track.album.images.map(img=> ({ src: img.url, sizes: img.width + 'x' + img.height, type: 'image/jpeg' }))
-    console.log('artwork', artwork)
+    if (!artwork.length) artwork.push({ src: defaultCover, sizes: '262x262', type: 'image/png' })
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.name,
       artist: track.artists.map(a=> a.name).join(', '),
       album: track.album.name,
       artwork: artwork,
     })
+    navigator.mediaSession.setActionHandler('nexttrack', nextTrack)
+    navigator.mediaSession.setActionHandler('previoustrack', prevTrackOrRestart)
+    navigator.mediaSession.setActionHandler('play', togglePlay)
+    navigator.mediaSession.setActionHandler('pause', togglePlay)
+    navigator.mediaSession.setActionHandler('stop', ()=> { audio.pause(); audio.currentTime = 0 })
+    navigator.mediaSession.setActionHandler('seekto', (details)=> {
+      if (details.fastSeek && ('fastSeek' in audio)) {
+        audio.fastSeek(details.seekTime)
+        return
+      }
+      audio.currentTime = details.seekTime
+    })
+  }
+  function updatePositionState(duration = null) {
+    if (!('setPositionState' in navigator.mediaSession)) return
+    if (isNaN(audio.duration) || audio.duration === Infinity || duration === 0) {
+      navigator.mediaSession.setPositionState(null)
+      return
+    }
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: audio.currentTime
+    })
   }
 
+  function prevTrackOrRestart() {
+    if (audio.currentTime <= MIN_TIME_PREV) dispatch(Actions.playPrevious())
+    else audio.currentTime = 0
+  }
+  function nextTrack() { dispatch(Actions.playNext()) }
+  function onPlayEnd() {
+    // entra aqui solo cuando state.repeat es 0 ó 2, cuando es 1 la propiedad audio.loop se encarga de repetir
+    // el track y el evento onended no se dispara
+    setState(state=> {
+      if (state.repeat === 2 && state.playAgain) {
+        audio.currentTime = 0
+        audio.play()
+        return { ...state, playAgain: false }
+      }
+      else {
+        nextTrack()
+        return { ...state }
+      }
+    })
+  }
   function togglePlay() { audio.paused ? audio.play() : audio.pause() }
+  function setRepeat() {
+    setState(state=> {
+      const repeat = (state.repeat + 1) % 3
+      audio.loop = repeat === 1
+      return { ...state, repeat, playAgain: repeat === 2 }
+    })
+  }
   function setDuration(value = null) {
-    setState(state=> ({ ...state, duration: (typeof value === 'number' ? value : audio.duration) }))
+    // value can be null, number or an event
+    if (isNaN(audio.duration)) value = 0
+    if (typeof value !== 'number') value = audio.duration
+    updatePositionState(value)
+    setState(state=> ({ ...state, duration: value }))
   }
   function setPlaying(value = null) {
     value ??= !audio.paused
@@ -107,12 +167,15 @@ export default function Player() {
     <div className="controls">
       <TimeProgress time={currentTime} total={state.duration} loaded={loaded} />
       <div className='_flex _content-center buttons'>
-        <button><i className='fas fa-shuffle'></i></button>
-        <button><i className='fas fa-backward-step'></i></button>
+        <button onPointerUp={()=> dispatch(Actions.toogleShuffle())}>
+          <i className={'fas fa-shuffle'+(shuffle ? ' selected' : '')}></i></button>
+        <button onPointerUp={prevTrackOrRestart}><i className='fas fa-backward-step'></i></button>
         <button onClick={togglePlay} className='play-pause'>
           <i className={'fas fa-circle-' + (state.playing ? 'pause' : 'play')}></i></button>
-        <button><i className='fas fa-forward-step'></i></button>
-        <button><i className='fas fa-repeat'></i></button>
+        <button onPointerUp={nextTrack}><i className='fas fa-forward-step'></i></button>
+        <button onPointerUp={setRepeat}>
+          <i className={'fas fa-repeat'+(state.repeat ? ' selected' : '')}>
+          {state.repeat === 2 && <span className='repeat-once'>1</span>}</i></button>
       </div>
       
     </div>
