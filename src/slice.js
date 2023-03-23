@@ -28,7 +28,7 @@ const reducers = {
     state.queue = action.payload;
     state.playedQueue = [];
     state.currentTrack = null;
-    setPositions(state.queue);
+    setInitialPositions(state.queue);
     if (state.shuffle) shuffleArray(state.queue);
   },
   toogleShuffle: (state) => {
@@ -54,14 +54,22 @@ export const fetchFrontPage = () => async (dispatch) => {
   dispatch(Actions.setFrontPage(data));
 }
 
-export const fetchArtistTracks = (artistId) => async (dispatch, getState) => {
+export const fetchArtistTracks = (artistId) => async (dispatch) => {
   const { data } = await axios.get(`${URL}/artist/${artistId}/tracks`);
   dispatch(Actions.setQueue(data.tracks));
   dispatch(Actions.playNext());
 }
 
+export const saveLikedTrack = async (trackId, add = true) => {
+  const { data } = await axios.post(URL + '/playlist/track/liked', {
+    track_id: trackId,
+    add: !!add,
+  })
+  return data;
+}
+
 // Helpers --------------
-function setPositions(queue) {
+function setInitialPositions(queue) {
   queue.forEach((track, index) => {
     track.position = index;
   });

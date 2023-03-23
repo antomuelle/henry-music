@@ -3,7 +3,7 @@ import defaultCover from '../assets/album.png'
 import { useEffect, useRef, useState } from 'react'
 import { parseTime, pickImage, useOnMounted, useOnUpdate } from '../lib/utils'
 import { useDispatch, useSelector } from 'react-redux'
-import { Actions } from '../slice'
+import { Actions, saveLikedTrack } from '../slice'
 
 const MIN_TIME_PREV = 5
 let audio
@@ -20,11 +20,13 @@ export default function Player() {
     duration: 0,
     muted: false,
     repeat: 0,// 0: off, 1: on, 2: once
-    playAgain: false,
   })
 
   const mounted = useOnMounted(()=> {
     audio = new Audio()
+    meta.playing = false
+    meta.playAgain = false
+    meta.repeat = 0
     setCurrentTime(0)
     setPlaying(false)
     audio.ondurationchange = setDuration
@@ -35,11 +37,11 @@ export default function Player() {
     audio.onpause = setPlaying
     audio.onplay = setPlaying
     audio.onvolumechange = () => { setState(state=> ({ ...state, muted: audio.muted })) }
-    audio.onplaying = () => {console.log('onplaying');setDuration()}
+    audio.onplaying = () => { setDuration() }
     audio.onended = onPlayEnd
-    audio.onseeked = () => console.log('onseeked')
-    audio.onloadstart = () => console.log('onloadstart')
-    audio.onloadeddata = () => console.log('onloadeddata')
+    // audio.onseeked = () => console.log('onseeked')
+    // audio.onloadstart = () => console.log('onloadstart')
+    // audio.onloadeddata = () => console.log('onloadeddata')
     audio.onerror = () => console.log('onerror')
     audio.onstalled = () => console.log('onstalled')
     audio.onabort = () => console.log('onabort')
@@ -71,7 +73,7 @@ export default function Player() {
     setCurrentTime(0)
     setPlaying(true)
     setDuration(0)
-    setState(state=> ({ ...state, playAgain: state.repeat === 2 }))
+    meta.playAgain = meta.repeat === 2
     audio.src = currentTrack.play_url
     updateMediaMetadata(currentTrack)
   }, [currentTrack], mounted)
@@ -118,26 +120,23 @@ export default function Player() {
   }
   function nextTrack() { dispatch(Actions.playNext()) }
   function onPlayEnd() {
-    // entra aqui solo cuando state.repeat es 0 ó 2, cuando es 1 la propiedad audio.loop se encarga de repetir
-    // el track y el evento onended no se dispara
-    setState(state=> {
-      if (state.repeat === 2 && state.playAgain) {
-        audio.currentTime = 0
-        audio.play()
-        return { ...state, playAgain: false }
-      }
-      else {
-        nextTrack()
-        return { ...state }
-      }
-    })
+    // entra aqui solo cuando state.repeat es 0 ó 2, cuando es 1 la propiedad audio.loop se encarga
+    // de repetir el track y el evento onended no se dispara
+    if (meta.repeat === 2 && meta.playAgain) {
+      audio.currentTime = 0
+      audio.play()
+      meta.playAgain = false
+      return
+    }
+    dispatch(Actions.playNext())
   }
   function togglePlay() { audio.paused ? audio.play() : audio.pause() }
   function setRepeat() {
     setState(state=> {
       const repeat = (state.repeat + 1) % 3
       audio.loop = repeat === 1
-      return { ...state, repeat, playAgain: repeat === 2 }
+      meta.playAgain = repeat === 2
+      return { ...state, repeat: (meta.repeat = repeat) }
     })
   }
   function setDuration(value = null) {
@@ -148,7 +147,7 @@ export default function Player() {
     setState(state=> ({ ...state, duration: value }))
   }
   function setPlaying(value = null) {
-    value ??= !audio.paused
+    (typeof value !== 'boolean') && (value = !audio.paused)
     setState((state)=> ({ ...state, playing: (meta.playing = value) }))
   }
   const volume = audio ? (audio.muted ? 0 : audio.volume) : 0
@@ -162,7 +161,10 @@ export default function Player() {
         <div className="title">{currentTrack.name}</div>
         <div className="artist">{currentTrack.artists.map(a=> a.name).join(', ')}</div>
       </div>
-      <p><i className='far fa-heart'></i></p> </>}
+      <div>
+        <p onPointerUp={()=> saveLikedTrack(currentTrack.id)} className='shine bubble liked' tabIndex="0">
+          <i className='far fa-heart'></i></p>
+      </div></>}
     </div>
     <div className="controls">
       <TimeProgress time={currentTime} total={state.duration} loaded={loaded} />
@@ -170,7 +172,7 @@ export default function Player() {
         <button onPointerUp={()=> dispatch(Actions.toogleShuffle())}>
           <i className={'fas fa-shuffle'+(shuffle ? ' selected' : '')}></i></button>
         <button onPointerUp={prevTrackOrRestart}><i className='fas fa-backward-step'></i></button>
-        <button onClick={togglePlay} className='play-pause'>
+        <button onClick={togglePlay} className='play-pause bubble'>
           <i className={'fas fa-circle-' + (state.playing ? 'pause' : 'play')}></i></button>
         <button onPointerUp={nextTrack}><i className='fas fa-forward-step'></i></button>
         <button onPointerUp={setRepeat}>

@@ -42,6 +42,15 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.data .liked {
+  line-height: 1;
+}
+.data .liked::before {
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+}
 
 .player .controls {
   flex-grow: 1;

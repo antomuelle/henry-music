@@ -83,6 +83,42 @@ button:hover {border-color: var(--orange4);}
   button {background-color: #f9f9f9;}
 } */
 
+.tabulated {
+  display: table;
+  table-layout: auto;
+  min-width: 380px;
+}
+.tabulated .row {display: table-row;}
+.tabulated .cell {display: table-cell;}
+.tabulated .cell:first-child {padding-right: .5em;}
+
+/****************** Animations ******************/
+.bubble:focus {animation: bubble .25s ease-out;}
+.bubble:active {animation: none;}
+@keyframes bubble {
+  0% {transform: scale(1);}
+  80% {transform: scale(1.75);}
+  100% {transform: scale(1);}
+}
+
+.shine {position: relative;}
+.shine::before {
+  content: '';
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  top: 0;left: 0;right: 0;bottom: 0;
+  background-color: currentColor;
+  transform: scale(0.001);
+}
+.shine:focus::before {animation: shine .75s ease-out;}
+.shine:active::before {animation: none;}
+@keyframes shine {
+  50% {transform: scale(1.5);opacity: 0;}
+  99% {transform: scale(0.001);opacity: 0;}
+  100% {transform: scale(0.001);opacity: 1;}
+}
+
 .rolling {
 	animation: rolling 1.5s infinite;
 	animation-timing-function: linear;
@@ -93,12 +129,3 @@ button:hover {border-color: var(--orange4);}
 	from {transform: rotate(0deg);}
 	to {transform: rotate(360deg);}
 }
-
-.tabulated {
-  display: table;
-  table-layout: auto;
-  min-width: 380px;
-}
-.tabulated .row {display: table-row;}
-.tabulated .cell {display: table-cell;}
-.tabulated .cell:first-child {padding-right: .5em;}
