@@ -1,0 +1,193 @@
+.hide-mini .miniplayer {
+  height: 0;
+  padding: 0;
+  border: 0;
+  transform: scale(0);
+}
+.miniplayer {
+  position: absolute;
+  display: flex;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 1em 0;
+  background-color: #161616;
+  border-top: solid 1px #2c2c2c;
+  z-index: 20;
+}
+
+.miniplayer .data, .miniplayer .extra {
+  width: 30%;
+  padding: 0 1em;
+  box-sizing: border-box;
+}
+
+.miniplayer .data {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  gap: 1rem;
+}
+.miniplayer .data .cover {height: 100%;}
+.miniplayer .data .cover img {
+  height: 100%;
+  object-fit: cover;
+}
+.miniplayer .data .info {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.data .info .title {
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.data .info .artist {
+  font-size: 14px;
+  color: var(--white5);
+  text-shadow: 0 0 2px black;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.data .liked {line-height: 1;}
+.data .liked .fas {color: var(--green-3);}
+.data .liked::before {
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+}
+.data .play {display: none;}
+
+.miniplayer .controls {
+  flex-grow: 1;
+}
+.miniplayer button {
+  color: var(--white5);
+  font-size: 1.1em;
+  border: 0;
+  border-radius: unset;
+  padding: 0.25rem 1.2rem;
+  background-color: transparent;
+  border-radius: 6px;
+  border: 0;
+}
+.play-pause, button.play-pause {
+  font-size: 1.75em;
+  color: var(--yellow6);
+}
+.play-pause i {background-color: #161616;border-radius: 50%;}
+.miniplayer button:hover {background-color:#2c2c2c;}
+.miniplayer button i.selected {color: var(--theme3);}
+.miniplayer .fa-repeat {position: relative;}
+.miniplayer .repeat-once {
+  position: absolute;
+  font-size: .75rem;
+  top: -35%;
+}
+
+.miniplayer .extra {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.miniplayer .extra .volume {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 40%;
+  align-self: flex-start;
+}
+.miniplayer .volume .tab-progress {flex-grow: 1;}
+
+.time-progress {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.time-progress .tab-progress {flex-grow: 1;}
+.time-progress > .text {
+  font-size: 14px;
+  line-height: 1;
+  min-width: 40px;
+}
+
+.progress {
+  position: relative;
+  height: 5px;
+  background-color: #2c2c2c;
+}
+.progress .progress-bar, .progress .meter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+.progress .progress-bar {background-color: var(--yellow6);}
+.progress .meter {background-color: #4a4a4a;}
+
+.tab-progress {
+  position: relative;
+  padding: 5px 0;
+}
+.tab-progress:hover .progress-bar {background-color: var(--theme2);}
+.tab-progress:hover .slicer {display: block;}
+.tab-progress .slicer {
+  position: absolute;
+  top: 50%;left: 0;
+  transform: translateY(-50%);
+  display: none;
+}
+.tab-progress .slicer p {
+  position: relative;
+  width: .75rem;
+  height: .75rem;
+  left: -.375rem;
+  /* top: calc(-.375rem + 2.5px); */
+  background-color: whitesmoke;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #161616;
+}
+.tab-progress.dragging .slicer {display: block;}
+.tab-progress.dragging .progress-bar {background-color: var(--theme2);}
+
+/* Media Queries */
+@media screen and (max-width: 480px) {
+  .miniplayer {
+    flex-direction: column;
+    position: fixed;
+    padding: .5em;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    background-color: rgba(22, 22, 22, 0.95);
+    border: 0;
+    border-radius: 8px;
+    bottom: 0;
+    opacity: 0;
+  }
+  .miniplayer.visible {
+    bottom: calc(var(--sidebar-height, 58px) - 1px);
+    opacity: 1;
+    animation: reveal .2s ease;
+  }
+  .miniplayer .data, .miniplayer .extra {width: 100%;padding: 0;}
+  .miniplayer .data {height: 3em;}
+  .miniplayer .info {flex-grow: 1;}
+  .miniplayer .data .liked {font-size: 1.5em;}
+  .miniplayer .data .play {display: block;}
+  .miniplayer .data .play button {padding: .25em;}
+  .miniplayer .extra {display: none;}
+  .miniplayer .controls .buttons {display: none;}
+  .miniplayer .controls .text {display: none;}
+
+  .tab-progress:hover .progress-bar {background-color: var(--yellow6);}
+  .tab-progress.dragging .progress-bar {background-color: var(--theme2);}
+  .tab-progress .progress {height: 2px;}
+  .tab-progress .slicer {display: none;}
+}
+
+@keyframes reveal {
+  from {opacity: 0;bottom: 0;}
+  to {opacity: 1;bottom: calc(var(--sidebar-height, 58px) - 1px);}
+}

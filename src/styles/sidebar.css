@@ -6,6 +6,7 @@
 .logo {width: 100%;}
 
 .menu a {
+  font-weight: 500;
   display: block;
   white-space: nowrap;
   text-align: left;
@@ -19,7 +20,6 @@
 }
 .menu a:hover i {color: #0097A7;}
 .menu a.active {
-  font-weight: 500;
   color: var(--yellow6);
   background-color: #0a0a0a;
 }

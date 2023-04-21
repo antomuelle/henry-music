@@ -39,7 +39,8 @@ export function useOnUpdate(effect, dependencies, mounted = null) {
 }
 
 // parse time to minutes:seconds from seconds
-export function parseTime(time) {
+export function parseTime(time, areMiliseconds = false) {
+  areMiliseconds && (time = time / 1000)
   const minutes = Math.floor(time / 60)
   const seconds = Math.floor(time - minutes * 60)
   return minutes + ':' + (seconds < 10 ? '0' + seconds : seconds)
@@ -104,6 +105,7 @@ export const mergeObj = (base, extend)=> {
 /** retorna el tipo del objeto en minusculas */
 export const typeOf = (obj)=> Object.prototype.toString.call(obj).split(' ')[1].slice(0, -1).toLowerCase()
 
+const IMG_URL = 'https://i.scdn.co/image/'
 export function pickImage(images, size = 's') {
   if (!images.length) return def_album
   if (typeof size === 'number') return pickImageFromWidth(images, size)
@@ -113,9 +115,9 @@ export function pickImage(images, size = 's') {
   else if (size === 'l') {min = 500, max = 1000}
   else {min = 1000, max = 10000}
   for (let i = 0; i < images.length; i++) {
-    if (images[i].width >= min && images[i].width < max) return images[i].url
+    if (images[i].width >= min && images[i].width < max) return IMG_URL + images[i].id
   }
-  return images[images.length - 1].url
+  return IMG_URL + images[images.length - 1].id
 }
 
 function pickImageFromWidth(images, width = 300) {
@@ -124,5 +126,19 @@ function pickImageFromWidth(images, width = 300) {
   for (let i = 0; i < images.length; i++) {
     if (Math.abs(images[i].width - width) < Math.abs(images[closest].width - width)) closest = i
   }
-  return images[closest].url
+  return IMG_URL + images[closest].id
+}
+
+// set css custom properties for vh and vw according to window size and the height of the player and sidebar
+let properties
+export function setCustomCssProps() {
+  console.log('calling props')
+  properties = [
+    ['--vh', window.innerHeight / 100 + 'px'],
+    ['--vw', window.innerWidth / 100 + 'px'],
+    ['--header-height', document.querySelector('header').offsetHeight + 'px'],
+    ['--player-height', document.querySelector('.miniplayer').offsetHeight + 'px'],
+    ['--sidebar-height', document.querySelector('.sidebar .wrapper').offsetHeight + 'px']
+  ]
+  properties.forEach(([key, value])=> { document.documentElement.style.setProperty(key, value) })
 }

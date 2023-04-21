@@ -22,8 +22,46 @@ header .dinamic {
 
 .floor {overflow-y: auto;}
 
+.main .splide__arrow {
+  width: 1.5em;
+  height: 100%;
+  background-color: transparent;
+  border-radius: 0;
+  opacity: .5;
+}
+.main .splide__arrow:hover:not(:disabled) {
+  background-color: var(--theme1);
+  opacity: .7;
+}
+.main .splide__arrow svg {fill: whitesmoke;}
+.main .splide__arrow--prev {left: 0;border-radius: 6px 0 0 6px;}
+.main .splide__arrow--next {right: 0;border-radius: 0 6px 6px 0;}
+.main .splide__pagination {bottom: -1.25rem;}
+
+.main .swiper-button-prev, .main .swiper-button-next {
+  width: auto;
+  height: 100%;
+  top: 0;
+  padding: 0 .25em;
+  margin-top: 0;
+}
+.main .swiper-button-prev:hover, .main .swiper-button-next:hover {background-color: rgba(0, 97, 100, 0.7);}
+.main .swiper-button-prev::after, .main .swiper-button-next::after {
+  font-size: 1.5rem;
+  color: whitesmoke;
+}
+.main .swiper-button-prev {left: 0;border-radius: 6px 0 0 6px;}
+.main .swiper-button-next {right: 0;border-radius: 0 6px 6px 0;}
+.main .swiper-pagination-progressbar-fill {background-color: var(--theme1);}
+
+.text-dots {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 @media screen and (max-width: 480px) {
-  #root {height: auto;}
+  /* #root {height: auto;} */
   .main {padding-bottom: 0;height: auto;}
   .floor {
     overflow-y: initial;

@@ -25,7 +25,7 @@ export default function SideBar() {
         <NavLink to="/collection">
           <i className="fas fa-layer-group"></i>
           <span>Your Library</span></NavLink>
-        <NavLink to="/collection/liked">
+        <NavLink to="/playlist/liked">
           <i className="fas fa-heart"></i>
           <span>Liked Songs</span></NavLink>
       </div>

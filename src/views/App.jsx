@@ -1,14 +1,15 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import Header from '../components/Header'
-import Player from '../components/Player'
+import MiniPlayer from '../components/MiniPlayer'
 import SideBar from '../components/SideBar'
+import { setCustomCssProps } from '../lib/utils'
 import '../styles/app.css'
 
 function App() {
   useEffect(()=> {
-    window.onresize = setVarProperties
-    setVarProperties()
+    window.onresize = setCustomCssProps
+    setCustomCssProps()
     return ()=> (window.onresize = null)
   }, [])
 
@@ -19,21 +20,9 @@ function App() {
       <Header />
       <Outlet />
     </div>
-    <Player />
+    <MiniPlayer />
   </div>
   )
-}
-
-// set css custom properties for vh and vw according to window size and the height of the player and sidebar
-let properties
-function setVarProperties() {
-  properties = [
-    ['--vh', window.innerHeight / 100 + 'px'],
-    ['--vw', window.innerWidth / 100 + 'px'],
-    ['--player-height', document.querySelector('.player').offsetHeight + 'px'],
-    ['--sidebar-height', document.querySelector('.sidebar .wrapper').offsetHeight + 'px']
-  ]
-  properties.forEach(([key, value])=> { document.documentElement.style.setProperty(key, value) })
 }
 
 export default App

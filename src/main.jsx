@@ -7,6 +7,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { router } from './router'
 import { Reducer } from './slice'
 import './styles/index.css'
+import { Toast } from './components/Shorts'
 
 const store = configureStore({ reducer: Reducer })
 const {
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         }} >
         <RouterProvider router={router} />
       </Auth0Provider>
+      <Toast />
     </Provider>
   </React.StrictMode>,
 )
