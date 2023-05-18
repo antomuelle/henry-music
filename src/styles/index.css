@@ -1,6 +1,8 @@
 html, body {height: 100%;}
 /* Disables pull-to-refresh but allows overscroll glow effects. */
 body {overscroll-behavior: contain;}
+body::-webkit-scrollbar {width: 10px;}
+body::-webkit-scrollbar-thumb {background-color: rgba(169, 169, 169, 0.25);}
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -107,7 +109,7 @@ button:hover {border-color: var(--orange4);}
   position: absolute;
   display: block;
   border-radius: 50%;
-  top: 0;left: 0;right: 0;bottom: 0;
+  /* top: 0;left: 0;right: 0;bottom: 0; */
   background-color: currentColor;
   transform: scale(0.001);
 }

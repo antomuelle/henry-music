@@ -1,6 +1,6 @@
 import '../styles/shorts.css'
 import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from 'react'
+import { cloneElement, useEffect, useState } from 'react'
 import { parseTime, pickImage } from '../lib/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -67,11 +67,10 @@ export const TracksTable = ({data, className = ''})=> {
 }
 
 export const PlayIcon = ({play = true, onTap=null})=> {
-  return (
-  <span className='play-pause' onPointerUp={(ev)=> {onTap && onTap()}}>
+  return <Tap onTap={(ev)=> {onTap && onTap(ev)}} elem={
+  <span className='play-pause'>
     <i className={'fas fa-circle-' + (play ? 'play' : 'pause')}></i>
-  </span>
-  )
+  </span>} />
 }
 
 export const LikeButton = ({ track, source=null, onLiked=null })=> {
@@ -107,10 +106,10 @@ export const Modal = ({children, redirect})=> {
   )
 }
 
-export const Loading = ({ show })=> {
+export const Loading = ({ show, className, style })=> {
   if (!show) return null
   return (
-  <div className="_flex-center loading">
+  <div className={"_flex-center loading " + (className ?? '')} style={style}>
     <div className="loader-wraper">
       <div className="loader">
         <p className="loader loader-inner"></p>
@@ -153,3 +152,30 @@ export const Errors = ({ errors })=> {
     </div>
   )
 }
+
+export const Tap = ({elem, onTap})=> {
+  function onPointerStart(ev) {
+    const target = ev.currentTarget
+    function onPointerUp(evt) {
+      target.removeEventListener('pointermove', onPointerMove)
+      target.removeEventListener('pointerup', onPointerUp)
+      onTap && onTap(evt)
+    }
+    function onPointerMove() {
+      target.removeEventListener('pointermove', onPointerMove)
+      target.removeEventListener('pointerup', onPointerUp)
+    }
+    
+    target.addEventListener('pointerup', onPointerUp)
+    target.addEventListener('pointermove', onPointerMove)
+  }
+
+  return cloneElement(elem, { onPointerDown: onPointerStart })
+}
+
+export const TapRender = ({render, onTap})=> {
+  const onStart = ()=> { console.log('starcho'); onTap && onTap() }
+  return render(onStart)
+}
+// call like this:
+// <TapRender render={(data)=> <button onClick={data}>May!</button>} onTap={()=> console.log('bridgeado')} />

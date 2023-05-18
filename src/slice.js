@@ -1,17 +1,21 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { pickImage, shuffleArray } from "./lib/utils";
-import { URL } from "./lib/constants";
-import "../node_modules/node-vibrant/dist/vibrant";
+import { EVENTS, URL } from "./lib/constants";
 
 const Vibrant = window.Vibrant
-// const URL = PROD ? '/api' : `http://localhost:${VITE_SERVER_PORT}/api`;
-// const URL = "https://henrymusic.tech/api/";
+// hack para guardar una referencia a dispatch, esta constante se inicializa en App.jsx
+export const shared = { dispatch: null }
+// revibe el evento like desde el miniplayer y busca en las queue's del estado para actualizar
+document.addEventListener(EVENTS.liked, (ev)=> {
+  shared.dispatch(Actions.searchToLike(ev.detail.id, !ev.detail.liked))
+})
 
 const initialState = {
   token: null,
   authenticated: null,
   shuffle: false,
+  repeat: 0,// 0: off, 1: on, 2: once
   frontPage: null,
   queue: [],
   playedQueue: [],
@@ -35,11 +39,24 @@ const reducers = {
     state.currentTrack = null;
     if (state.shuffle) shuffleArray(state.queue);
   },
+  searchToLike: {
+    prepare: (id, value)=> ({ payload: {id, value} }),
+    reducer: (state, action)=> {
+      const {id, value} = action.payload
+      let index = state.queue.findIndex(track=> track.id === id)
+      if (index >= 0 && state.queue[index].liked !== value)
+        state.queue[index].liked = value
+      index = state.playedQueue.findIndex(track=> track.id === id)
+      if (index >= 0 && state.playedQueue[index].liked !== value)
+        state.queue[index].liked = value
+    }
+  },
   toogleShuffle: (state) => {
     state.shuffle = !state.shuffle;
     if (state.shuffle) shuffleArray(state.queue);
     else state.queue.sort((a, b) => a.position - b.position);
   },
+  setRepeat: (state, action) => { state.repeat = action.payload },
   setTrackColor: (state, action)=> { state.trackColor = action.payload },
   playTrack: {
     reducer: (state, action) => {
@@ -52,11 +69,13 @@ const reducers = {
     if (!state.queue.length) return;
     state.currentTrack && state.playedQueue.push(state.currentTrack);
     state.currentTrack = state.queue.shift();
+    dispatchColors(state.currentTrack)
   },
   playPrevious: (state) => {
     if (!state.playedQueue.length) return;
     state.queue.unshift(state.currentTrack);
     state.currentTrack = state.playedQueue.pop();
+    dispatchColors(state.currentTrack)
   },
   setLikedTracks: (state, action) => { state.likedTracks = action.payload; },
   updateLikedList: {
@@ -138,8 +157,6 @@ export const saveLikeTrack = async (track, value)=> {
     track_id: track.id,
     add: !!value,
   })
-  // const copy = { ...track, liked: !!value }
-  // value && (copy.PlaylistTrack = { created_at: data.time })
   return data.track
 }
 
@@ -150,6 +167,15 @@ export const fetchTrack = async (id)=> {
 }
 
 // Helpers --------------
+async function dispatchColors(track) {
+  const palette = await Vibrant.from(pickImage(track.album.images)).getPalette()
+  const colors = {}
+  Object.keys(palette).forEach(color=> {
+    colors[color.toLowerCase()] = palette[color].getRgb()
+  })
+  shared.dispatch(Actions.setTrackColor(colors))
+}
+
 function setInitialPositions(queue) {
   queue.forEach((track, index) => {
     track.position = index;
@@ -158,7 +184,6 @@ function setInitialPositions(queue) {
 
 function likeSourceTrack(state, source, track, value) {
   const [pointer, lastProp] = getPointer(state, source)
-  console.log('pointer called')
   const index = pointer[lastProp].findIndex(elem=> elem.id === track.id)
   pointer[lastProp][index].liked = value
 }

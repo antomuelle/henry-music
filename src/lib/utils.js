@@ -132,7 +132,6 @@ function pickImageFromWidth(images, width = 300) {
 // set css custom properties for vh and vw according to window size and the height of the player and sidebar
 let properties
 export function setCustomCssProps() {
-  console.log('calling props')
   properties = [
     ['--vh', window.innerHeight / 100 + 'px'],
     ['--vw', window.innerWidth / 100 + 'px'],

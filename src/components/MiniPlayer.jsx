@@ -5,128 +5,92 @@ import { parseTime, pickImage, setCustomCssProps, showToast, useOnMounted, useOn
 import { useDispatch, useSelector } from 'react-redux'
 import { Actions, likeCurrentTrack } from '../slice'
 import { EVENTS, audio } from '../lib/constants'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import tinycolor from 'tinycolor2'
+import { Tap } from './Shorts'
 
 const MIN_TIME_PREV = 5
+const shared = {
+  dispatch: null,
+  playAgain: false,
+  repeat: false,
+  showQueue: false
+}
 
 export function PlayerControls({audio}) {
   const dispatch = useDispatch()
-  const currentTrack = useSelector((state)=> state.currentTrack)
+  const repeat = useSelector(state=> state.repeat)
   const shuffle = useSelector((state)=> state.shuffle)
-  const meta = useRef(null)
-  const [state, setState] = useState({
-    repeat: 0,
-    playing: !audio.paused,
-  })
+  const [playing, setPlaying] = useState(!audio.paused)
 
-  function update(prop, value) { setState(state=> ({ ...state, [prop]: value})) }
-
-  const isMounted = useOnMounted(()=> {
-
-  }, [])
   useOnMounted(()=> {
-    meta.playing = false
-    meta.playAgain = false
-    meta.repeat = 0
-    meta.lastTrackId = null
+    shared.dispatch = dispatch
 
-    function onCanPlay() { meta.playing && audio.play() }
-    function onVolumeChange() { update('muted', audio.muted) }
-
-    audio.addEventListener('canplay', onCanPlay)
-    audio.addEventListener('pause', setPlaying)
-    audio.addEventListener('play', setPlaying)
-    audio.addEventListener('volumechange', onVolumeChange)
+    audio.addEventListener('pause', updatePlaying)
+    audio.addEventListener('play', updatePlaying)
 
     return function clear() {
-      audio.removeEventListener('canplay', onCanPlay)
-      audio.removeEventListener('pause', setPlaying)
-      audio.removeEventListener('play', setPlaying)
-      audio.removeEventListener('volumechange', onVolumeChange)
+      audio.removeEventListener('pause', updatePlaying)
+      audio.removeEventListener('play', updatePlaying)
     }
-  }, [currentTrack], isMounted)
+  })
 
-  function prevTrackOrRestart() {
-    if (audio.currentTime <= MIN_TIME_PREV) dispatch(Actions.playPrevious())
-    else audio.currentTime = 0
-  }
-  function nextTrack() { dispatch(Actions.playNext()) }
-  function togglePlay() { audio.paused ? audio.play() : audio.pause() }
+  function updatePlaying() { setPlaying(!audio.paused) }
   function setRepeat() {
-    setState(state=> {
-      const repeat = (state.repeat + 1) % 3
-      audio.loop = repeat === 1
-      meta.playAgain = repeat === 2
-      return { ...state, repeat: (meta.repeat = repeat) }
-    })
-  }
-  function setPlaying(value = null) {
-    (typeof value !== 'boolean') && (value = !audio.paused)
-    setState((state)=> ({ ...state, playing: (meta.playing = value) }))
+    const value = (repeat + 1) % 3
+    audio.loop = (value === 1)
+    shared.repeat = value
+    shared.playAgain = (value === 2)
+    dispatch(Actions.setRepeat(value))
   }
 
   return (
-  <div className="play-controls">
-    <div className='_flex _content-center buttons'>
-      <button onPointerUp={()=> dispatch(Actions.toogleShuffle())}>
-        <i className={'fas fa-shuffle'+(shuffle ? ' selected' : '')}></i></button>
-      <button onPointerUp={prevTrackOrRestart}><i className='fas fa-backward-step'></i></button>
-      <button onClick={togglePlay} className='play-pause'>
-        <i className={'fas fa-circle-' + (state.playing ? 'pause' : 'play')}></i></button>
-      <button onPointerUp={nextTrack}><i className='fas fa-forward-step'></i></button>
-      <button onPointerUp={setRepeat}>
-        <i className={'fas fa-repeat'+(state.repeat ? ' selected' : '')}>
-        {state.repeat === 2 && <span className='repeat-once'>1</span>}</i></button>
-    </div>
+  <div className='_flex _content-center buttons play-buttons'>
+    <button onPointerUp={()=> dispatch(Actions.toogleShuffle())}>
+      <i className={'fas fa-shuffle'+(shuffle ? ' selected' : '')}></i></button>
+    <button onPointerUp={Media.prevTrackOrRestart}><i className='fas fa-backward-step'></i></button>
+    <Tap onTap={Media.togglePlay} elem={<button className='play-pause'>
+      <i className={'fas fa-circle-' + (playing ? 'pause' : 'play')}></i></button>} />
+    <button onPointerUp={Media.nextTrack}><i className='fas fa-forward-step'></i></button>
+    <button onPointerUp={setRepeat}>
+      <i className={'fas fa-repeat'+(repeat ? ' selected' : '')}>
+      {repeat === 2 && <span className='repeat-once'>1</span>}</i></button>
   </div>
   )
 }
 
 export default function MiniPlayer() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const currentTrack = useSelector((state)=> state.currentTrack)
   const trackColor = useSelector(state=> state.trackColor)
-  const shuffle = useSelector((state)=> state.shuffle)
   const meta = useRef(null)
   const [state, setState] = useState({
     playing: false,
-    duration: 0,
-    muted: false,
-    repeat: 0,// 0: off, 1: on, 2: once
     liked: false,
+    color: '#161616'
   })
 
   const mounted = useOnMounted(()=> {
-    // audio = new Audio()
+    shared.dispatch = dispatch
     meta.playing = false
-    meta.playAgain = false
-    meta.repeat = 0
     meta.lastTrackId = null
-    meta.color = '#161616'
-    setPlaying(false)
-    audio.oncanplay = () => { meta.playing && audio.play() }
-    audio.onpause = setPlaying
-    audio.onplay = setPlaying
+
+    audio.addEventListener('pause', updatePlaying)
+    audio.addEventListener('play', updatePlaying)
+    audio.oncanplay = ()=> { meta.playing && audio.play() }
     audio.onvolumechange = () => { setState(state=> ({ ...state, muted: audio.muted })) }
+    audio.onerror = () => { showToast("We can't play this song"); dispatch(Actions.playNext()) }
     audio.onended = onPlayEnd
-    audio.onerror = () => { showToast("Can't play this song"); dispatch(Actions.playNext()) }
-    audio.onstalled = () => console.log('onstalled')
-    audio.onabort = () => console.log('onabort')
-    // audio.onseeked = () => console.log('onseeked')
-    // audio.onloadstart = () => console.log('onloadstart')
-    // audio.onloadeddata = () => console.log('onloadeddata')
+
     return ()=> {
+      audio.removeEventListener('pause', updatePlaying)
+      audio.removeEventListener('play', updatePlaying)
       audio.oncanplay = null
-      audio.onpause = null
-      audio.onplay = null
-      audio.onplaying = null
+      audio.onvolumechange = null
       audio.onended = null
       audio.onerror = null
-      audio.onstalled = null
-      audio.onabort = null
       audio.pause()
-      audio.src = null
     }
   })
 
@@ -142,132 +106,150 @@ export default function MiniPlayer() {
       meta.firtsTime = true
     }
     meta.lastTrackId = currentTrack.id
-    setPlaying(true)
-    setState(state=> ({ ...state, liked: currentTrack.liked }))
-    meta.playAgain = meta.repeat === 2
+    shared.playAgain = (shared.repeat === 2)
     audio.src = currentTrack.play_url
+    setState(state=> ({ ...state, liked: currentTrack.liked, playing: (meta.playing = true) }))
     updateMediaMetadata(currentTrack)
+    updatePositionState(audio)
   }, [currentTrack], mounted)
 
   useEffect(()=> {
     if (!trackColor) return
+    let color = '#161616'
     if (window.innerWidth <= 420) {
-      console.log('tamare')
-      const color = tinycolor({
+      const tiny = tinycolor({
         r: trackColor.darkvibrant[0],
         g: trackColor.darkvibrant[1],
         b: trackColor.darkvibrant[2],
       })
-      color.setAlpha(0.95).darken(5).toRgbString()
-      meta.color = color
+      tiny.setAlpha(0.95)
+      color = tiny.toRgbString()
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', color)
     }
-    else {meta.color = '#161616'}
+    setState(state=> ({ ...state, color: color }))
   }, [trackColor])
 
-  function updateMediaMetadata(track) {
-    if (!('mediaSession' in navigator)) return
-    const artwork = track.album.images.map(img=> ({ src: img.url, sizes: img.width + 'x' + img.height, type: 'image/jpeg' }))
-    if (!artwork.length) artwork.push({ src: defaultCover, sizes: '262x262', type: 'image/png' })
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.name,
-      artist: track.artists.map(a=> a.name).join(', '),
-      album: track.album.name,
-      artwork: artwork,
-    })
-    navigator.mediaSession.setActionHandler('nexttrack', nextTrack)
-    navigator.mediaSession.setActionHandler('previoustrack', prevTrackOrRestart)
-    navigator.mediaSession.setActionHandler('play', togglePlay)
-    navigator.mediaSession.setActionHandler('pause', togglePlay)
-    navigator.mediaSession.setActionHandler('stop', ()=> { audio.pause(); audio.currentTime = 0 })
-    navigator.mediaSession.setActionHandler('seekto', (details)=> {
-      if (details.fastSeek && ('fastSeek' in audio)) {
-        audio.fastSeek(details.seekTime)
-        return
-      }
-      audio.currentTime = details.seekTime
-    })
-  }
-
-  function prevTrackOrRestart() {
-    if (audio.currentTime <= MIN_TIME_PREV) dispatch(Actions.playPrevious())
-    else audio.currentTime = 0
-  }
-  function nextTrack() { dispatch(Actions.playNext()) }
+  function updatePlaying() { setState(state=> ({ ...state, playing: !audio.paused })) }
   function onPlayEnd() {
-    // entra aqui solo cuando state.repeat es 0 ó 2, cuando es 1 la propiedad audio.loop se encarga
-    // de repetir el track y el evento onended no se dispara
-    if (meta.repeat === 2 && meta.playAgain) {
+    if (shared.repeat === 2 && shared.playAgain) {
+      // entra aqui solo cuando state.repeat es 0 ó 2, cuando es 1 la propiedad audio.loop se encarga
+      // de repetir el track y el evento onended no se dispara
       audio.currentTime = 0
       audio.play()
-      meta.playAgain = false
+      shared.playAgain = false
       return
     }
     dispatch(Actions.playNext())
   }
-  function togglePlay() { audio.paused ? audio.play() : audio.pause() }
-  function setRepeat() {
-    setState(state=> {
-      const repeat = (state.repeat + 1) % 3
-      audio.loop = repeat === 1
-      meta.playAgain = repeat === 2
-      return { ...state, repeat: (meta.repeat = repeat) }
-    })
-  }
-  function setPlaying(value = null) {
-    (typeof value !== 'boolean') && (value = !audio.paused)
-    setState((state)=> ({ ...state, playing: (meta.playing = value) }))
-  }
-  function toogleLiked() {
+  function toggleLiked(ev) {
+    ev.stopPropagation()
     dispatch(likeCurrentTrack(currentTrack, !state.liked))
     setState(state=> ({ ...state, liked: !state.liked }))
     document.dispatchEvent(new CustomEvent(EVENTS.liked, {detail: currentTrack}))
+  }
+  function toggleQueue(ev) {
+    ev.currentTarget.classList.toggle('active')
+    shared.showQueue = !shared.showQueue
+    document.dispatchEvent(new CustomEvent(EVENTS.queue, {detail: (shared.showQueue)}))
+  }
+  function onPlayerPointed(ev) {
+    ev.preventDefault()
+    ev.stopPropagation()
+    if (window.innerWidth <= 420)
+      navigate('player')
   }
   const volume = audio ? (audio.muted ? 0 : audio.volume) : 0
 
   if (!currentTrack) return <div className="miniplayer"></div>
   return (
   <div className="miniplayer visible"
-    style={{backgroundColor: meta.color}}>
-    <div className="data">
+    style={{backgroundColor: state.color}}>
+    <div onPointerUp={onPlayerPointed} className="data">
       {currentTrack && <>
-      <div className="cover"><img src={pickImage(currentTrack.album.images)} alt={currentTrack.name} /></div>
+      <Link to='player' onPointerUp={stopProp} className="cover"><img src={pickImage(currentTrack.album.images)} alt={currentTrack.name} /></Link>
       <div className="_text-left info">
-        <div className="title"><Link to={'player/'+currentTrack.id}>{currentTrack.name}</Link></div>
+        <div className="title"><Link to='player' onPointerUp={stopProp}>{currentTrack.name}</Link></div>
         <div className="artist">{currentTrack.artists.map(a=> a.name).join(', ')}</div>
       </div>
       <div>
-        <p onPointerUp={toogleLiked} className='shine bubble liked' tabIndex="0">
+        <p onPointerUp={toggleLiked} className='shine bubble liked' tabIndex="0">
           <i className={'fa'+(state.liked?'s':'r')+' fa-heart'}></i></p>
       </div>
       <div className='play'>
-        <button onClick={togglePlay} className='play-pause'>
+        <button onPointerUp={Media.togglePlay} className='play-pause'>
           <i className={'fas fa-circle-' + (state.playing ? 'pause' : 'play')}></i></button>
       </div></>}
     </div>
     <div className="controls">
       <TimeTabProgress audio={audio} />
-      <div className='_flex _content-center buttons'>
-        <button onPointerUp={()=> dispatch(Actions.toogleShuffle())}>
-          <i className={'fas fa-shuffle'+(shuffle ? ' selected' : '')}></i></button>
-        <button onPointerUp={prevTrackOrRestart}><i className='fas fa-backward-step'></i></button>
-        <button onClick={togglePlay} className='play-pause'>
-          <i className={'fas fa-circle-' + (state.playing ? 'pause' : 'play')}></i></button>
-        <button onPointerUp={nextTrack}><i className='fas fa-forward-step'></i></button>
-        <button onPointerUp={setRepeat}>
-          <i className={'fas fa-repeat'+(state.repeat ? ' selected' : '')}>
-          {state.repeat === 2 && <span className='repeat-once'>1</span>}</i></button>
-      </div>
-      
+      <PlayerControls audio={audio} />
     </div>
     <div className="extra">
-      <div className="volume">
+      <div className="volume-control">
         <i onClick={()=> {audio.muted = !audio.muted}} className={'fas fa-volume-' + (state.muted || !audio?.volume ? 'xmark' : 'low')}></i>
         <TabProgress total={1} value={volume}
           onDrag={(value)=> {audio.volume = value; value > 0 && (audio.muted = false)}} />
       </div>
+      <Tap onTap={toggleQueue} elem={<button className='queue-link'><i className="fas fa-list"></i></button>} />
     </div>
   </div>
   )
+}
+
+export function VolumeControl({ audio }) {
+  const [muted, setMuted] = useState(audio.muted)
+  useEffect(()=> {
+    function onVolumeChange() { setMuted(audio.muted) }
+    audio.addEventListener('volumechange', onVolumeChange)
+
+    return ()=> { audio.removeEventListener('volumechange', onVolumeChange) }
+  }, [])
+
+  const volume = audio ? (audio.muted ? 0 : audio.volume) : 0
+
+  return (
+  <div className="volume-control">
+    <i onClick={()=> {audio.muted = !audio.muted}} className={'fas fa-volume-' + (muted || !audio?.volume ? 'xmark' : 'low')}></i>
+    <TabProgress total={1} value={volume}
+      onDrag={(value)=> {audio.volume = value; value > 0 && (audio.muted = false)}} />
+  </div>
+  )
+}
+
+const stopProp = (ev)=> {ev.stopPropagation()}
+const Media = {
+  nextTrack() { shared.dispatch(Actions.playNext()) },
+  togglePlay(ev) {
+    if (ev.stopPropagation) ev.stopPropagation()
+    audio.paused ? audio.play() : audio.pause()
+  },
+  prevTrackOrRestart() {
+    if (audio.currentTime <= MIN_TIME_PREV) shared.dispatch(Actions.playPrevious())
+    else audio.currentTime = 0
+  },
+}
+function updateMediaMetadata(track) {
+  if (!('mediaSession' in navigator)) return
+  const artwork = track.album.images.map(img=> ({ src: img.url, sizes: img.width + 'x' + img.height, type: 'image/jpeg' }))
+  if (!artwork.length) artwork.push({ src: defaultCover, sizes: '262x262', type: 'image/png' })
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: track.name,
+    artist: track.artists.map(a=> a.name).join(', '),
+    album: track.album.name,
+    artwork: artwork,
+  })
+  navigator.mediaSession.setActionHandler('nexttrack', Media.nextTrack)
+  navigator.mediaSession.setActionHandler('previoustrack', Media.prevTrackOrRestart)
+  navigator.mediaSession.setActionHandler('play', Media.togglePlay)
+  navigator.mediaSession.setActionHandler('pause', Media.togglePlay)
+  navigator.mediaSession.setActionHandler('stop', ()=> { audio.pause(); audio.currentTime = 0 })
+  navigator.mediaSession.setActionHandler('seekto', (details)=> {
+    if (details.fastSeek && ('fastSeek' in audio)) {
+      audio.fastSeek(details.seekTime)
+      return
+    }
+    audio.currentTime = details.seekTime
+  })
 }
 
 export function TimeTabProgress({audio}) {
@@ -312,12 +294,11 @@ export function TimeTabProgress({audio}) {
   }, [state.time], isMounted)
 
   function update(prop, value) { setState(state=> ({ ...state, [prop]: value})) }
-  function setDuration(value = null) {
-    console.log('call duration')
+  function setDuration(value = 0) {
     // value can be null, number or an event
     if (isNaN(audio.duration)) value = 0
     if (typeof value !== 'number') value = audio.duration
-    // updatePositionState(value)
+    updatePositionState(value)
     setState(state=> ({ ...state, duration: value }))
   }
 
@@ -338,12 +319,11 @@ export function TabProgress({value, total, meter=null, onDragStart=null, onDrag=
   const element = useRef(null)
   const [slicer, setSlicer] = useState(0)
   const [advanced, setAdvanced] = useState(value)
-  useEffect(()=> {
-    return ()=> {
-      element.current && (element.current.onmousedown = null)
-      window.onmousemove = null
-      window.onmouseup = null
-    }
+  
+  useEffect(()=> ()=> {
+    element.current && (element.current.onmousedown = null)
+    window.onmousemove = null
+    window.onmouseup = null
   }, [])
   useEffect(()=> {
     // if (total === 0) {value = 0, total = 1;}
@@ -409,10 +389,11 @@ export function Progress({ value, total = 100, meter = null }) {
   )
 }
 
-function updatePositionState(audio, duration = null) {
+function updatePositionState(audio, duration = 0) {
   if (!('setPositionState' in navigator.mediaSession)) return
+
   if (isNaN(audio.duration) || audio.duration === Infinity || duration === 0) {
-    navigator.mediaSession.setPositionState(null)
+    navigator.mediaSession.setPositionState()
     return
   }
   navigator.mediaSession.setPositionState({

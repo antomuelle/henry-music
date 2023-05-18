@@ -1,6 +1,6 @@
 import '../styles/cards.css'
 import { useDispatch } from 'react-redux'
-import { Actions, fetchAlbumTracks, fetchArtistTracks, fetchTrack, playTrack } from '../slice'
+import { fetchAlbumTracks, fetchArtistTracks, fetchTrack, playTrack } from '../slice'
 import { parseTime, pickImage } from '../lib/utils'
 import { LikeButton, PlayIcon } from './Shorts'
 import dayjs from 'dayjs'
@@ -43,21 +43,20 @@ export function Artist({artist}) {
   )
 }
 
-export function Track({track, source=null, onLiked=null, index=null, minimal=false, likeTime=false}) {
+export function Track({track, source=null, onLiked=null, index=null, minimal=false, likeTime=false, className}) {
   const dispatch = useDispatch()
   async function playThisTrack() {
-    // dispatch(Actions.playTrack(minimal ? await fetchTrack(track.id) : track))
     dispatch(playTrack(minimal ? await fetchTrack(track.id) : track))
   }
 
   return (
-  <div className="track">
+  <div className={"track " + (className ?? '')}>
     {index && <p className='enum'>{index}</p>}
     <div className="name">
       <div className="play">
         <button onPointerUp={playThisTrack}><i className="fas fa-play"></i></button>
       </div>
-      <img src={pickImage(minimal ? track.images : track.album.images)} alt={track.name} />
+      <img src={pickImage(track.images ?? track.album.images)} alt={track.name} />
       <div>
         <p>{track.name}</p>
         <p>{track.artists.map(a=> a.name).join(', ')}</p>
@@ -66,7 +65,7 @@ export function Track({track, source=null, onLiked=null, index=null, minimal=fal
     {!minimal && <p className='album'>{track.album.name}</p>}
     {likeTime && <p className='time'>{dayjs(track.PlaylistTrack.created_at).fromNow()}</p>}
     <div className="like"><LikeButton track={track} source={source} onLiked={onLiked} /></div>
-    {track.duration && <p className="duration">{parseTime(track.duration, true)}</p>}
+    {(!minimal && track.duration) && <p className="duration">{parseTime(track.duration, true)}</p>}
   </div>
   )
 }
@@ -89,12 +88,12 @@ export function Album({album}) {
   )
 }
 
-export function Card({track, source}) {
+export function Card({track, source, width}) {
   const dispatch = useDispatch()
   
   function setTrack() { dispatch(playTrack(track, source)) }
   return (
-  <div className='_column card figure' onPointerUp={setTrack}>
+  <div className='_column card figure' onPointerUp={setTrack} style={{width: width ?? null}}>
     <LikeButton track={track} source={source} />
     <div className='_ratio _1-1'>
       <img src={pickImage(track.album.images, 'm')} alt={track.name} />

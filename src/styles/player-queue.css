@@ -1,0 +1,32 @@
+.play-queue {
+  text-align: left;
+  width: 50%;
+  max-width: 500px;
+  height: 100%;
+  padding: 1rem;
+  padding-bottom: .5rem;
+  box-sizing: border-box;
+  background-color: #181818;
+  overflow-y: auto;
+}
+.play-queue::-webkit-scrollbar {width: 10px;}
+.play-queue::-webkit-scrollbar-thumb {background-color: rgba(169, 169, 169, 0.25);}
+.play-queue h6 {line-height: 1;}
+
+.play-queue .playing {background-color: var(--theme1);}
+.play-queue .playing .name p:last-child {color: var(--white5);}
+
+.play-queue .section {
+  font-weight: 500;
+  padding-top: 1em;
+  padding-bottom: .5em;
+}
+.play-queue .vlist > div {margin-bottom: .5rem;}
+
+@media screen and (max-width: 480px) {
+  .play-queue {
+    width: 100%;
+    height: calc(100vh - var(--header-height) - var(--player-height) - var(--sidebar-height));
+    height: calc(calc(var(--vh) * 100) - var(--header-height) - var(--player-height) - var(--sidebar-height));
+  }
+}

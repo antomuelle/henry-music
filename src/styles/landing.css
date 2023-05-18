@@ -1,0 +1,91 @@
+.landing {
+  font-family: Roboto, Lato;
+  color: #cacaca;
+  min-height: 100%;
+  background-color: rgb(10, 10, 10);
+}
+.landing img {display: inline-block;}
+.landing .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  height: 5em;
+}
+.header .logo {height: 100%;gap: 1rem;}
+.header img {height: 100%;}
+
+.header .nav {
+  display: flex;
+  gap: 1rem;
+}
+.header button, .header a {
+  color: black;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: .5em 1em;
+  white-space: nowrap;
+  background-color: var(--yellow6);
+}
+.header a:hover {color: black;}
+
+.grad {
+  color: black;
+  font-size: 2em;
+  padding: 1em 0;
+  background: linear-gradient(90deg, #00ffff 10%, #fff700 50%, #ffa3ff 90%);
+}
+.pods {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+.pods img {max-width: 250px;}
+.rude {width: 100%;max-width: 1000px;}
+
+.team .leader {
+  display: inline-block;
+  width: 50%;
+  max-width: 400px;
+}
+.team .wrapper {
+  background-color: rgba(128, 128, 128, 0.1);
+  padding: .5em;
+  margin-top: .5rem;
+  border-radius: 1em;
+}
+.team .colla {
+  font-size: 1.5em;
+  border-bottom: solid 4px rgb(90, 90, 90);
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+.team ._columns {justify-content: space-around;}
+.team ._column {padding: 2.5%;}
+.team ._column img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+.team ._column p {font-size: 1.2em;white-space: nowrap;}
+.team ._column p:first-of-type {font-weight: 700;color: var(--white5);}
+.team ._column a {vertical-align: sub;}
+.team i.fab {
+  color: var(--blue-6);
+  font-size: 1.75rem;
+}
+
+@media screen and (max-width: 1280px) {
+  .header .nav {padding-right: 1rem;}
+  .landing ._limiter-hd {padding: 0 1rem;}
+}
+@media screen and (max-width: 480px) {
+  ._limiter-hd.header {padding: 0;}
+  .landing .header {height: auto;}
+  .landing .header .logo {display: flex;}
+  .landing .header h2 {font-size: 1.5rem;}
+  .landing .header img {height: 70px;}
+  .landing .header .nav a {display: none;}
+  .landing .grad h1 {font-size: 2rem;}
+  .team ._columns {align-items: center;row-gap: 2rem;}
+  .team ._column {width: 65%;}
+}

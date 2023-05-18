@@ -2,7 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
-import { Actions } from "../slice"
+import { Actions, shared } from "../slice"
 import App from "./App"
 import Landing from "./Landing"
 
@@ -14,6 +14,7 @@ export default function Stage() {
   useEffect(() => {
     if (isLoading) return
     (async () => {
+      shared.dispatch ??= dispatch
       if (isAuthenticated) {
         const token = await getAccessTokenSilently()
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`

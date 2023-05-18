@@ -45,10 +45,10 @@
 
 @media screen and (max-width: 480px) {
   /* .floor {height: 100%;} */
-  .loading {height: calc(100vh - var(--header-height) - var(--player-height));}
+  .playlist .loading {height: calc(100vh - var(--header-height) - var(--player-height));}
+  .playlist .duration {display: none;}
   .header > img {display: none;}
   .like-songs {padding-bottom: 0;}
   .like-songs .enum, .like-songs .album, .like-songs .time {display: none;}
   .like-songs .name {flex-grow: 1;}
-  .like-songs .like {padding: 0;}
 }

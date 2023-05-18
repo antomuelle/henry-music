@@ -10,17 +10,9 @@
   box-sizing: border-box;
 }
 
-header {
-  display: flex;
-  padding: .5em 1em;
-  background-color: rgba(255, 255, 255, 0.15);
-}
-header .dinamic {
-  flex-grow: 1;
-  box-sizing: border-box;
-}
-
-.floor {overflow-y: auto;}
+.floor {overflow-y: auto;position: relative;}
+.floor::-webkit-scrollbar {width: 10px;}
+.floor::-webkit-scrollbar-thumb {background-color: rgba(169, 169, 169, 0.25);}
 
 .main .splide__arrow {
   width: 1.5em;
@@ -67,4 +59,5 @@ header .dinamic {
     overflow-y: initial;
     padding-bottom: calc(var(--player-height, 136px) + var(--sidebar-height, 58px));
   }
+  .home.loading {height: 95vh;}
 }

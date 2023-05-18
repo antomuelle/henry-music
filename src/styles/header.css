@@ -1,0 +1,49 @@
+header {
+  display: flex;
+  column-gap: 1em;
+  padding: .5em 1em;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+}
+header .dinamic {
+  flex-grow: 1;
+  box-sizing: border-box;
+}
+.blend {
+  mix-blend-mode: difference;
+}
+
+.profile {
+  display: flex;
+  column-gap: .5em;
+  align-items: center;
+  position: relative;
+  cursor: default;
+}
+.profile img {
+  max-height: 1.5em;
+  max-width: 1.5em;
+  border-radius: 50%;
+}
+.profile .wrapper {
+  display: none;
+  position: absolute;
+  top: 100%;right: 0;
+}
+.profile .wrapper p {
+  line-height: 1;
+  margin-bottom: -2px;
+}
+.profile .caret {
+  display: inline-block;
+  border-left: solid .75rem transparent;
+  border-bottom: solid .6rem var(--black1);
+  border-right: solid .75rem transparent;
+}
+.profile:hover .wrapper, .profile:focus .wrapper {display: block;}
+.profile .opts {
+  box-shadow: 1px 1px 2px rgba(245, 245, 245, 0.4);
+}
+.profile .opts li {
+  padding: .5em .75em;
+  background-color: var(--black1);
+}

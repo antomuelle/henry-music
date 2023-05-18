@@ -62,7 +62,7 @@
 .track {
   display: flex;
   align-items: center;
-  height: 3.5em;
+  height: 3.25em;
   gap: 1rem;
   background-color: #303030;
   box-sizing: border-box;
@@ -79,7 +79,7 @@
 }
 .track .play {height: 100%;}
 .track .play button {
-  color: var(--white3);
+  color: var(--yellow6);
   display: block;
   padding: 0 1em;
   background-color: transparent;
@@ -101,7 +101,7 @@
   line-height: 1.4;
 }
 .track .name p:first-child {color: whitesmoke;font-weight: 500;}
-.track .name p:last-child {color: var(--gray-4);}
+.track .name p:last-child {color: var(--gray-4);font-size: .875em;}
 .track .like {padding-right: 1em;}
 
 .figure img {border-radius: .5rem .5rem 0 0;}

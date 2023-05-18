@@ -45,8 +45,6 @@
 }
 .data .info .artist {
   font-size: 14px;
-  color: var(--white5);
-  text-shadow: 0 0 2px black;
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -59,11 +57,11 @@
   height: 200%;
 }
 .data .play {display: none;}
+.data .play-pause {background-color: transparent;border: 0;}
 
-.miniplayer .controls {
-  flex-grow: 1;
-}
-.miniplayer button {
+.miniplayer .controls {flex-grow: 1;}
+
+.play-buttons button {
   color: var(--white5);
   font-size: 1.1em;
   border: 0;
@@ -71,35 +69,32 @@
   padding: 0.25rem 1.2rem;
   background-color: transparent;
   border-radius: 6px;
-  border: 0;
 }
-.play-pause, button.play-pause {
-  font-size: 1.75em;
-  color: var(--yellow6);
-}
-.play-pause i {background-color: #161616;border-radius: 50%;}
-.miniplayer button:hover {background-color:#2c2c2c;}
-.miniplayer button i.selected {color: var(--theme3);}
-.miniplayer .fa-repeat {position: relative;}
-.miniplayer .repeat-once {
+.play-buttons button:hover {background-color:#2c2c2c;}
+.play-buttons button i.selected {color: var(--theme3);}
+.play-buttons .fa-repeat {position: relative;}
+.play-buttons .repeat-once {
   position: absolute;
   font-size: .75rem;
-  top: -35%;
+  top: -25%;
 }
+.play-pause, button.play-pause {font-size: 1.75em;color: var(--yellow6);}
+.play-pause i {background-color: #161616;border-radius: 50%;}
 
 .miniplayer .extra {
   display: flex;
   justify-content: flex-end;
+  align-items: start;
   gap: 1rem;
 }
-.miniplayer .extra .volume {
+.volume-control {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  width: 40%;
   align-self: flex-start;
 }
-.miniplayer .volume .tab-progress {flex-grow: 1;}
+.volume-control .tab-progress {flex-grow: 1;}
+.miniplayer .volume-control {width: 40%;}
 
 .time-progress {
   display: flex;
@@ -116,7 +111,7 @@
 .progress {
   position: relative;
   height: 5px;
-  background-color: #2c2c2c;
+  background-color: #808080;
 }
 .progress .progress-bar, .progress .meter {
   position: absolute;
@@ -125,7 +120,7 @@
   height: 100%;
 }
 .progress .progress-bar {background-color: var(--yellow6);}
-.progress .meter {background-color: #4a4a4a;}
+.progress .meter {background-color: #777777;}
 
 .tab-progress {
   position: relative;
@@ -172,7 +167,7 @@
     animation: reveal .2s ease;
   }
   .miniplayer .data, .miniplayer .extra {width: 100%;padding: 0;}
-  .miniplayer .data {height: 3em;}
+  .miniplayer .data {height: 2.5em;}
   .miniplayer .info {flex-grow: 1;}
   .miniplayer .data .liked {font-size: 1.5em;}
   .miniplayer .data .play {display: block;}
@@ -180,6 +175,8 @@
   .miniplayer .extra {display: none;}
   .miniplayer .controls .buttons {display: none;}
   .miniplayer .controls .text {display: none;}
+
+  .play-buttons button:hover {background-color: initial;}
 
   .tab-progress:hover .progress-bar {background-color: var(--yellow6);}
   .tab-progress.dragging .progress-bar {background-color: var(--theme2);}
