@@ -7,6 +7,7 @@ import Playlist from "./views/Playlist";
 import Search from "./views/Search";
 import { PlayQueue } from "./components/PlayQueue";
 
+
 export const router = createBrowserRouter([
   {
     path: "/",

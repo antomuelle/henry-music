@@ -1,8 +1,8 @@
 import { Navigation, Pagination } from "swiper";
 
 const { PROD, VITE_SERVER_PORT } = import.meta.env;
-const BASE_URL = PROD ? '/api' : `http://localhost:${VITE_SERVER_PORT}/api`;
-// const BASE_URL = "https://henrymusic.tech/api"
+//const BASE_URL = PROD ? '/api' : `http://localhost:${VITE_SERVER_PORT}/api`;
+ const BASE_URL = "https://henrymusic.tech/api"
 
 export const audio = new Audio()
 

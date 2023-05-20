@@ -5,6 +5,9 @@ import { useDispatch } from "react-redux"
 import { Actions, shared } from "../slice"
 import App from "./App"
 import Landing from "./Landing"
+import LandingOne from "./LandingOne"
+
+
 
 export default function Stage() {
   const { isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0()
@@ -28,8 +31,8 @@ export default function Stage() {
   return (
   <>
     {!ready ?
-      <Loading /> :
-      (isAuthenticated ? <App /> : <Landing />)}
+      <LandingOne /> :
+      (isAuthenticated ? <App /> : <LandingOne />)}
   </>
   )
 }
