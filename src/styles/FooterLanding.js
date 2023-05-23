@@ -11,6 +11,7 @@ import styled from 'styled-components'
 
    @media (max-width: 768px) {
     width: auto;
+    
    }
 `;
 
@@ -48,15 +49,16 @@ export const CompanyName = styled.h3`
 
 export const Imagenes = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
-  gap: 200px;
+  gap: 0px;
   padding-top: 30px;
+  padding-right: 50px;
   div {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 0px;
   }
 
   p{
@@ -78,16 +80,23 @@ export const Imagenes = styled.div`
     display: flex;
     flex-direction: column;
    width: 100%;
-   gap: 13px;
+   gap: 0px;
    align-items: center;
    text-align: center;
    padding: 0;
    margin-left: 30px;
-   padding-top: 30px;
+   padding-top: 20px;
 
    img{
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
+   }
+   p{
+    font-size: 13px;
+   }
+
+   a{
+    font-size: 13px;
    }
   }
 `;

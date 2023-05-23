@@ -16,6 +16,8 @@ const Cursor = styled.div`
   background-color: #254f48;
   pointer-events: none;
   z-index: 9999;
+
+  @media(max-width: 768px){display:none}
 `;
 
 function LandingOne() {

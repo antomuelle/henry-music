@@ -7,7 +7,8 @@ import fb from '../assets/fb.png'
 import git from '../assets/github.png'
 import juan from '../assets/team/bianchi.jpg'
 import antonio from '../assets/team/antonio.jpg'
-
+import abigail from '../assets/team/abi.jpg'
+import erick from '../assets/team/erick.jpg'
 
 function FooterLanding() {
     return (
@@ -33,11 +34,24 @@ function FooterLanding() {
                             <p style={{ color: '#333' }}> Front-End</p>
                             <a href="https://www.linkedin.com/in/juan-jose-bianchi/" target="_blank">LinkedIn</a>
                         </div>
+                        <div>
+                            <img src={abigail} alt="abigail" />
+                            <p>Abigail Cortes</p>
+                            <p style={{ color: '#333' }}> Full-Stack</p>
+                            <a href="https://www.linkedin.com/in/abigail-cort%C3%A9s-s%C3%A1nchez/" target="_blank">LinkedIn</a>
+                        </div>
+                        <div>
+                            <img src={erick} alt="erick" />
+                            <p>Erick Espinoza</p>
+                            <p style={{ color: '#333' }}> Software-Developer</p>
+                            <a href="https://www.linkedin.com/in/ericks-espinoza-g%C3%B3mez-58b9b8231/" target="_blank">LinkedIn</a>
+                        </div>
+                        
                     </Imagenes>
                 </FooterContainer>
                 <Container>
                     <ContactInfo>
-                        <span>¡Descubre las diversas formas de utilizar nuestra API en tus proyectos!</span>
+                        {/* <span>¡Descubre las diversas formas de utilizar nuestra API en tus proyectos!</span> */}
                         <p> hmusic@gmail.com</p>
                     </ContactInfo>
                     <SocialMediaLinks>
