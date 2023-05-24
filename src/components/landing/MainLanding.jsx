@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import { MainContainer, LeftPanel, RightPanel, Texto } from '../styles/MainLanding'
-import deportivo from '../assets/deportivo.jpg'
+import { MainContainer, LeftPanel, RightPanel, Texto } from '../../styles/MainLanding'
+import deportivo from '../../assets/deportivo.jpg'
 // import laboral from '../assets/laboral.jpg'
-import listas from '../assets/listas.png'
+import listas from '../../assets/listas.png'
 import { Slide, Zoom } from 'react-reveal';
 
 

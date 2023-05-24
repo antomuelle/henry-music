@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import NavLanding from '../components/NavLanding'
-import HeaderLanding from '../components/HeaderLanding'
-import MainLanding from '../components/MainLanding'
+import NavLanding from '../components/landing/NavLanding'
+import HeaderLanding from '../components/landing/HeaderLanding'
+import MainLanding from '../components/landing/MainLanding'
 import styled from 'styled-components';
-import NosotrosLanding from '../components/NosotrosLanding';
-import FooterLanding from '../components/FooterLanding';
+import NosotrosLanding from '../components/landing/NosotrosLanding';
+import FooterLanding from '../components/landing/FooterLanding';
 
 const Cursor = styled.div`
   position: fixed;

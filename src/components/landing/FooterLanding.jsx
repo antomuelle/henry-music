@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { FooterContainer, CopyRight, SocialMediaLinks, CompanyName, ContactInfo, Imagenes, Container } from '../styles/FooterLanding'
+import { FooterContainer, CopyRight, SocialMediaLinks, CompanyName, ContactInfo, Imagenes, Container } from '../../styles/FooterLanding'
 import { Element } from 'react-scroll';
-import yt from '../assets/yt.png'
-import fb from '../assets/fb.png'
-import git from '../assets/github.png'
-import juan from '../assets/team/bianchi.jpg'
-import antonio from '../assets/team/antonio.jpg'
+import yt from '../../assets/yt.png'
+import fb from '../../assets/fb.png'
+import git from '../../assets/github.png'
+import juan from '../../assets/team/bianchi.jpg'
+import antonio from '../../assets/team/antonio.jpg'
 
 
 function FooterLanding() {
@@ -20,7 +20,7 @@ function FooterLanding() {
                             HMusic es un proyecto en conjunto como programadores Full-Stack junior, diseñado para captar la atención de posibles reclutadores y mostrar nuestras habilidades y pasión por la programación.
                         </p>
                     </CompanyName>
-                    <Imagenes>
+                    {/* <Imagenes>
                         <div>
                             <img src={antonio} alt="muelle" />
                             <p>Antonio Muelle</p>
@@ -33,7 +33,7 @@ function FooterLanding() {
                             <p style={{ color: '#333' }}> Front-End</p>
                             <a href="https://www.linkedin.com/in/juan-jose-bianchi/" target="_blank">LinkedIn</a>
                         </div>
-                    </Imagenes>
+                    </Imagenes> */}
                 </FooterContainer>
                 <Container>
                     <ContactInfo>

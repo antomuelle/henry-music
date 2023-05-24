@@ -68,6 +68,7 @@ export const Imagenes = styled.div`
     color: #0077B5;
   }
   img {
+    object-fit: cover;
     width: 120px;
     height: 120px;
     clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 70%);
