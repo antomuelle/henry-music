@@ -1,5 +1,5 @@
 import React from 'react'
-import { HeaderContainer, TextContainer, HeaderText, ImageContainer } from '../../styles/HeaderLanding'
+import { HeaderContainer, TextContainer, HeaderText, ImageContainer } from '../../styles/landing/HeaderLanding'
 import mujer from '../../assets/mujer.jpg'
 import { Slide, Fade } from 'react-reveal';
 import { useAuth0 } from "@auth0/auth0-react"

@@ -50,7 +50,7 @@ export const TextContainer = styled.div`
     align-items: center;
     text-align: center;
     width: 70%;
-    font-size: 12px;
+    padding-top: .5rem;
   }
 
   @media (max-width: 768px) {

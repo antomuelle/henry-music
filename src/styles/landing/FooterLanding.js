@@ -6,16 +6,18 @@ import styled from 'styled-components'
   color: whitesmoke;
   padding: 20px;
   text-align: center;
-   height: auto;
-   display: flex;
+  height: auto;
+  display: flex;
 
-   @media (max-width: 768px) {
+  @media (max-width: 480px) {
     width: auto;
-   }
+    flex-direction: column;
+  }
 `;
 
 export const CompanyName = styled.h3`
   font-size: 60px;
+  font-weight: 400;
   margin-bottom: 10px;
   text-align: start;
   color: #f1f1f1;
@@ -26,7 +28,7 @@ export const CompanyName = styled.h3`
   p{
     font-size: 18px;
     width: 60%;
-    color: #333;
+    color: gray;
     text-align: start;
   }
 
@@ -36,7 +38,6 @@ export const CompanyName = styled.h3`
     p{
         font-size: 14px;
         width: 100%;
-        text-align: center;
     }
 
   }
@@ -48,17 +49,20 @@ export const CompanyName = styled.h3`
 
 export const Imagenes = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
-  gap: 200px;
+  gap: 0px;
   padding-top: 30px;
+  padding-right: 50px;
   div {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 0px;
   }
 
+  div p:first-of-type {padding-top: .5em}
+  div p:last-of-type {color: gray}
   p{
     font-size: large;
     color: whitesmoke;
@@ -78,18 +82,34 @@ export const Imagenes = styled.div`
   @media (max-width: 768px) {
     display: flex;
     flex-direction: column;
-   width: 100%;
-   gap: 13px;
-   align-items: center;
-   text-align: center;
-   padding: 0;
-   margin-left: 30px;
-   padding-top: 30px;
+    width: 100%;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+    padding: 0;
+    margin-left: 30px;
+    padding-top: 20px;
 
-   img{
-    width: 80px;
-    height: 80px;
-   }
+    img{
+      width: 70px;
+      height: 70px;
+    }
+    p{
+      font-size: 13px;
+    }
+
+    a{
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0;
+    div {width: calc(50% - 1rem);}
+    img {width: 80%;height: 80%}
+    p, a {font-size: 1rem;}
   }
 `;
 
@@ -135,10 +155,9 @@ export const SocialMediaLinks = styled.ul`
 
 export const CopyRight = styled.p`
   font-size: 14px;
-  color: #333;
-  @media (max-width: 768px) {
-    font-size: 10px;
-  }
+  color: gray;
+  padding-bottom: 1rem;
+  @media (max-width: 768px) {}
 `;
 
 export const Container = styled.div`

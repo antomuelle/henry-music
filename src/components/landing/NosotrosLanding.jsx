@@ -1,6 +1,6 @@
 import React from 'react'
 import tablet from '../../assets/tablet.png'
-import { NosotrosContainer, Image, Text } from '../../styles/NosotrosLanding'
+import { NosotrosContainer, Image, Text } from '../../styles/landing/NosotrosLanding'
 
 function NosotrosLanding() {
     return (

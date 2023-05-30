@@ -92,6 +92,7 @@ export const NavLink = styled.a`
   font-weight: 500;
   display: flex;
   justify-content: center;
+  cursor: pointer;
 
   button {
     background-color: white;

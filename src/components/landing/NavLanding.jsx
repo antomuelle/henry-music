@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavContainer, Logo, NavbarLinks, NavbarItem, NavLink } from '../../styles/NavLanding'
+import { NavContainer, Logo, NavbarLinks, NavbarItem, NavLink } from '../../styles/landing/NavLanding'
 import logo from '../../assets/logo.png'
 import { useAuth0 } from "@auth0/auth0-react"
 import { Link } from 'react-scroll';

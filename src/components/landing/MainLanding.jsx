@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { MainContainer, LeftPanel, RightPanel, Texto } from '../../styles/MainLanding'
+import { MainContainer, LeftPanel, RightPanel, Texto } from '../../styles/landing/MainLanding'
 import deportivo from '../../assets/deportivo.jpg'
 // import laboral from '../assets/laboral.jpg'
 import listas from '../../assets/listas.png'
